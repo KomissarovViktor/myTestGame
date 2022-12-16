@@ -72,6 +72,8 @@ int main(int argc, char** argv)
             std::cerr << "Can't create shader program: " << "DefaultShaderProgram" << std::endl;
             return -1;
         }
+
+        resourceManager.loadTexture("DefaultTexture", "res/textures/map_16x16.png");
         GLuint points_vbo = 0;
         glGenBuffers(1, &points_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
