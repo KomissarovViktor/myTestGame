@@ -1,4 +1,4 @@
-#include "ShaderProgram.h";
+#include "ShaderProgram.h"
 #include <iostream>
 namespace Renderer {
 	ShaderProgram::ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader)
@@ -61,6 +61,11 @@ namespace Renderer {
     ShaderProgram::~ShaderProgram()
     {
         glDeleteProgram(m_id);
+    }
+
+    void ShaderProgram::setInt(const std::string& name, const GLint value)
+    {
+        glUniform1i(glGetUniformLocation(m_id, name.c_str()), value);
     }
 
     void ShaderProgram::use() const

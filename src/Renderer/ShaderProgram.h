@@ -6,13 +6,17 @@ namespace Renderer{
 	{
 	public:
 		ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
+
 		ShaderProgram() = delete;
 		ShaderProgram(ShaderProgram&) = delete;
 		ShaderProgram& operator=(const ShaderProgram&) = delete;
+
 		ShaderProgram& operator=(ShaderProgram&& shaderProgram) noexcept;
 		ShaderProgram(ShaderProgram&& shaderProgram) noexcept;
 
 		~ShaderProgram();
+
+		void setInt(const std::string& name, const GLint value);
 		bool isCompiled() const { return m_isCompiled; }
 		void use() const;
 	private:
