@@ -4,6 +4,8 @@
 #include "Renderer/ShaderProgram.h"
 #include "Resources/ResourceManager.h"
 #include "Renderer/Texture2D.h"
+#include <glm/mat4x4.hpp>
+
 GLfloat points[] = {
      0.0f,  0.5f, 0.0f,
     -0.5f, -0.5f, 0.0f,
@@ -22,14 +24,13 @@ GLfloat texCoords[] = {
 };
 
 
-int g_windowSizeX = 640;
-int g_windowSizeY = 480;
+glm::vec2 g_windowSize(640, 480);
 
 void glfwWindowSizeCallback(GLFWwindow* pwindow, int width, int height)
 {
-    g_windowSizeX = width;
-    g_windowSizeY = height;
-    glViewport(0, 0, g_windowSizeX, g_windowSizeY);
+    g_windowSize.x = width;
+    g_windowSize.y = height;
+    glViewport(0, 0, width, height);
 }
 void glfwKeyCallback(GLFWwindow* pwindow, int key, int scancode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* pwindow = glfwCreateWindow(640, 480, "MyGame", nullptr, nullptr);
+    GLFWwindow* pwindow = glfwCreateWindow(g_windowSize.x, g_windowSize.y, "MyGame", nullptr, nullptr);
     if (!pwindow)
     {
         std::cout << "glfwCreateWindow failed!" << std::endl;
