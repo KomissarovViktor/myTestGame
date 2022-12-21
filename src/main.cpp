@@ -5,6 +5,7 @@
 #include "Renderer/ShaderProgram.h"
 #include "Resources/ResourceManager.h"
 #include "Renderer/Texture2D.h"
+#include "Renderer/Sprite.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
@@ -85,7 +86,17 @@ int main(int argc, char** argv)
             return -1;
         }
 
+        auto pSpriteShaderProgram = resourceManager.loadShaderProgram("SpriteShader", "res/shaders/vSprite.txt", "res/shaders/fSprite.txt");
+        if (!pSpriteShaderProgram->isCompiled())
+        {
+            std::cerr << "Can't create shader program: " << "SpriteShader" << std::endl;
+            return -1;
+        }
         auto tex = resourceManager.loadTexture("DefaultTexture", "res/textures/map_16x16.png");
+
+        auto pSprite = resourceManager.loadSprite("NewSprite", "DefaultTexture", "SpriteShader", 128, 100);
+        pSprite->setPosition(glm::vec2(300, 200));
+
         GLuint points_vbo = 0;
         glGenBuffers(1, &points_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
@@ -127,9 +138,11 @@ int main(int argc, char** argv)
 
         glm::mat4 projectionMatrix = glm::ortho(0.f, g_windowSize.x, 0.f, g_windowSize.y, -100.f, 100.f);
 
-        
         pDefaultShaderProgram->setMatrix4("projectionMat", projectionMatrix);
 
+        pSpriteShaderProgram->use();
+        pSpriteShaderProgram->setInt("tex", 0);
+        pSpriteShaderProgram->setMatrix4("projectionMat", projectionMatrix);
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(pwindow))
         {
@@ -145,6 +158,8 @@ int main(int argc, char** argv)
 
             pDefaultShaderProgram->setMatrix4("modelMat", modelMatrix2);
             glDrawArrays(GL_TRIANGLES, 0, 3);
+
+            pSprite->render();
             /* Swap front and back buffers */
             glfwSwapBuffers(pwindow);
 
