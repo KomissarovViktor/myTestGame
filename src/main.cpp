@@ -94,8 +94,14 @@ int main(int argc, char** argv)
         }
         auto tex = resourceManager.loadTexture("DefaultTexture", "res/textures/map_16x16.png");
 
-        auto pSprite = resourceManager.loadSprite("NewSprite", "DefaultTexture", "SpriteShader", 128, 100);
-        pSprite->setPosition(glm::vec2(300, 200));
+        std::vector<std::string> subTexturesName = { "brickBlock","topLeftBrick","topRightBrick","topBrick","bottomLeftBrick","leftBrick",
+                                                 "bottomLeft_topRightBrick","brickBlock_without_bottomRightBrick","bottomRightBrick",
+                                                 "topLeft_bottomRightBrick","rightBrick","brickBlock_without_bottomLeftBrick",
+                                                 "bottomBrick","brickBlock_without_topRightBrick","brickBlock_without_topLeftBrick"};
+
+        auto pTextureAtlas = resourceManager.loadTextureAtlas("map_8x8", "res/textures/map_8x8.png", std::move(subTexturesName), 8, 8);
+        auto pSpriteBrick = resourceManager.loadSprite("brickBlockSprite", "map_8x8", "SpriteShader", 100, 100, "bottomBrick");
+        pSpriteBrick->setPosition(glm::vec2(300, 200));
 
         GLuint points_vbo = 0;
         glGenBuffers(1, &points_vbo);
@@ -159,7 +165,8 @@ int main(int argc, char** argv)
             pDefaultShaderProgram->setMatrix4("modelMat", modelMatrix2);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            pSprite->render();
+            pSpriteBrick->render();
+            
             /* Swap front and back buffers */
             glfwSwapBuffers(pwindow);
 
