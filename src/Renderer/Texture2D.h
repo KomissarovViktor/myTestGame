@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 #include <glad/glad.h>
 #include <string>
 #include <glm/vec2.hpp>
@@ -32,11 +32,11 @@ namespace Renderer {
 		Texture2D(const Texture2D&) = delete;
 		Texture2D& operator=(const Texture2D&) = delete;
 
-		Texture2D& operator=(Texture2D&& texture2d);
-		Texture2D(Texture2D&& texture2d);
+		Texture2D& operator=(Texture2D&& texture2d) noexcept;
+		Texture2D(Texture2D&& texture2d) noexcept;
 		~Texture2D();
 		
-		void addSubTexture(const std::string subTextureName, const glm::vec2& leftBottomUV, const glm::vec2& rightTopUV);
+		void addSubTexture(std::string subTextureName, const glm::vec2& leftBottomUV, const glm::vec2& rightTopUV);
 		const SubTexture2D& getSubTexture(const std::string subTextureName);
 
 		unsigned int getWidth() const { return m_width; }
