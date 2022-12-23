@@ -1,11 +1,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <chrono>
 
 #include "Renderer/ShaderProgram.h"
 #include "Resources/ResourceManager.h"
 #include "Renderer/Texture2D.h"
 #include "Renderer/Sprite.h"
+#include "Renderer/AnimatedSprite.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
@@ -94,14 +96,25 @@ int main(int argc, char** argv)
         }
         auto tex = resourceManager.loadTexture("DefaultTexture", "res/textures/map_16x16.png");
 
+
         std::vector<std::string> subTexturesName = { "brickBlock","topLeftBrick","topRightBrick","topBrick","bottomLeftBrick","leftBrick",
-                                                 "bottomLeft_topRightBrick","brickBlock_without_bottomRightBrick","bottomRightBrick",
-                                                 "topLeft_bottomRightBrick","rightBrick","brickBlock_without_bottomLeftBrick",
-                                                 "bottomBrick","brickBlock_without_topRightBrick","brickBlock_without_topLeftBrick"};
+                                                     "bottomLeft_topRightBrick","brickBlock_without_bottomRightBrick","bottomRightBrick",
+                                                     "topLeft_bottomRightBrick","rightBrick","brickBlock_without_bottomLeftBrick",
+                                                     "bottomBrick","brickBlock_without_topRightBrick","brickBlock_without_topLeftBrick","water1","water2","water3" };
+
 
         auto pTextureAtlas = resourceManager.loadTextureAtlas("map_8x8", "res/textures/map_8x8.png", std::move(subTexturesName), 8, 8);
-        auto pSpriteBrick = resourceManager.loadSprite("brickBlockSprite", "map_8x8", "SpriteShader", 100, 100, "bottomBrick");
-        pSpriteBrick->setPosition(glm::vec2(300, 200));
+
+        auto pAnimatedSprite = resourceManager.loadAnimatedSprite("brickBlockSprite", "map_8x8", "SpriteShader", 100, 100, "brickBlock");
+        pAnimatedSprite->setPosition(glm::vec2(300, 200));
+
+        std::vector<std::pair<std::string, uint64_t>> waterFlowStates;
+        waterFlowStates.emplace_back(std::make_pair<std::string, uint64_t>("water1", 1000000000));
+        waterFlowStates.emplace_back(std::make_pair<std::string, uint64_t>("water2", 1000000000));
+        waterFlowStates.emplace_back(std::make_pair<std::string, uint64_t>("water3", 1000000000));
+
+        pAnimatedSprite->insertState("waterFlow", waterFlowStates);
+
 
         GLuint points_vbo = 0;
         glGenBuffers(1, &points_vbo);
@@ -149,9 +162,17 @@ int main(int argc, char** argv)
         pSpriteShaderProgram->use();
         pSpriteShaderProgram->setInt("tex", 0);
         pSpriteShaderProgram->setMatrix4("projectionMat", projectionMatrix);
+        
+        pAnimatedSprite->setState("waterFlow");
+
+        auto lastTime = std::chrono::high_resolution_clock::now();
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(pwindow))
         {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            uint64_t duration = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - lastTime).count();
+            lastTime = currentTime;
+            pAnimatedSprite->update(duration);
             /* Render here */
             glClear(GL_COLOR_BUFFER_BIT);
 
@@ -165,7 +186,7 @@ int main(int argc, char** argv)
             pDefaultShaderProgram->setMatrix4("modelMat", modelMatrix2);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            pSpriteBrick->render();
+            pAnimatedSprite->render();
             
             /* Swap front and back buffers */
             glfwSwapBuffers(pwindow);
